@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:11.4
+    container_name: get_pet_db
+    restart: always
+    env_file:
+      - ./.env
+    ports:
+      - 5432:5432
+  
+  app:
+    image: node:14.18
+    env_file:
+      - ./.env
+    container_name: get_pet_app
+    restart: on-failure:10
+    depends_on:
+      - postgres
+    ports:
+    - 3000:3000
+    volumes:
+      - .:/usr/app
+      - /usr/app/node_modules
+    working_dir: /usr/app
+    command: bash -c "npm install && npm run migrations && npm start"
+  
